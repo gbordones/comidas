@@ -1,0 +1,174 @@
+:root {
+    --background-color: #f4f4f9;
+    --text-color: #333;
+    --card-background: #fff;
+    --border-color: #ccc;
+    --button-background: #007bff;
+    --button-hover-background: #0056b3;
+    --suggestions-hover-background: #f0f0f0;
+    --shadow-color: rgba(0,0,0,0.1);
+}
+
+body.dark-mode {
+    --background-color: #282c34;
+    --text-color: #e0e0e0;
+    --card-background: #3a3f47;
+    --border-color: #555;
+    --button-background: #61dafb;
+    --button-hover-background: #21a1f1;
+    --suggestions-hover-background: #4a4f57;
+    --shadow-color: rgba(0,0,0,0.3);
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    flex-direction: column; /* Changed to column for better layout with toggle */
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.container {
+    background: var(--card-background);
+    padding: 2em;
+    border-radius: 10px;
+    box-shadow: 0 8px 16px var(--shadow-color);
+    width: 100%;
+    max-width: 550px;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+h1 {
+    text-align: center;
+    color: var(--text-color);
+    margin-bottom: 1.5em;
+    transition: color 0.3s ease;
+}
+
+.form-group {
+    margin-bottom: 1.5em;
+}
+
+label {
+    display: block;
+    margin-bottom: 0.6em;
+    font-weight: bold;
+    color: var(--text-color);
+    transition: color 0.3s ease;
+}
+
+input[type="text"],
+input[type="number"],
+select {
+    width: 100%;
+    padding: 0.9em;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    box-sizing: border-box;
+    background-color: var(--card-background);
+    color: var(--text-color);
+    transition: border-color 0.3s ease, background-color 0.3s ease, color 0.3s ease;
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus,
+select:focus {
+    outline: none;
+    border-color: var(--button-background);
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+button {
+    width: 100%;
+    padding: 1em;
+    border: none;
+    background-color: var(--button-background);
+    color: white;
+    border-radius: 6px;
+    font-size: 1.1em;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    margin-top: 1em;
+}
+
+button:hover {
+    background-color: var(--button-hover-background);
+    transform: translateY(-2px);
+}
+
+button:active {
+    transform: translateY(0);
+}
+
+#suggestions {
+    border: 1px solid var(--border-color);
+    border-top: none;
+    max-height: 180px;
+    overflow-y: auto;
+    background-color: var(--card-background);
+    border-bottom-left-radius: 6px;
+    border-bottom-right-radius: 6px;
+    z-index: 10; /* Ensure suggestions are above other elements */
+    position: relative; /* Needed for z-index to work */
+}
+
+#suggestions div {
+    padding: 10px;
+    cursor: pointer;
+    color: var(--text-color);
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+#suggestions div:hover {
+    background-color: var(--suggestions-hover-background);
+}
+
+#macro-info {
+    margin-top: 1.5em;
+    padding: 1em;
+    background-color: var(--suggestions-hover-background); /* Lighter background for info */
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+#macro-info h3 {
+    margin-top: 0;
+    color: var(--text-color);
+    transition: color 0.3s ease;
+}
+
+#macro-info p {
+    margin: 0.5em 0;
+    color: var(--text-color);
+    transition: color 0.3s ease;
+}
+
+.theme-toggle-container {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 100;
+}
+
+#theme-toggle {
+    width: auto;
+    padding: 0.8em 1.5em;
+    font-size: 0.9em;
+    margin-top: 0;
+    background-color: var(--button-background);
+    color: white;
+    border-radius: 20px;
+    box-shadow: 0 2px 4px var(--shadow-color);
+}
+
+#theme-toggle:hover {
+    background-color: var(--button-hover-background);
+    transform: translateY(-1px);
+}
