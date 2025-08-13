@@ -172,3 +172,61 @@ button:active {
     background-color: var(--button-hover-background);
     transform: translateY(-1px);
 }
+
+#daily-summary, #today-meals {
+    background: var(--card-background);
+    padding: 1.5em;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px var(--shadow-color);
+    margin-top: 2em;
+    width: 100%;
+    max-width: 550px;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+#daily-summary h2, #today-meals h2 {
+    text-align: center;
+    color: var(--text-color);
+    margin-top: 0;
+    margin-bottom: 1em;
+    transition: color 0.3s ease;
+}
+
+#daily-summary p {
+    margin: 0.5em 0;
+    font-size: 1.1em;
+    color: var(--text-color);
+    transition: color 0.3s ease;
+}
+
+#daily-summary strong {
+    font-weight: bold;
+    color: var(--button-background); /* Highlight with accent color */
+    transition: color 0.3s ease;
+}
+
+#meals-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+#meals-list li {
+    background-color: var(--suggestions-hover-background); /* Use a slightly different background */
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1em;
+    margin-bottom: 0.8em;
+    font-size: 0.95em;
+    color: var(--text-color);
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}
+
+#meals-list li:last-child {
+    margin-bottom: 0;
+}
+
+#meals-list li strong {
+    color: var(--button-background);
+    transition: color 0.3s ease;
+}

@@ -5,15 +5,22 @@ document.addEventListener('DOMContentLoaded', () => {
     const mealTypeSelect = document.getElementById('meal-type');
     const macroInfoDiv = document.getElementById('macro-info');
     const foodForm = document.getElementById('food-form');
-    const themeToggleButton = document.getElementById('theme-toggle'); // New element
+    const themeToggleButton = document.getElementById('theme-toggle');
+
+    // New elements for daily summary and meals list
+    const totalCaloriesSpan = document.getElementById('total-calories');
+    const totalProteinSpan = document.getElementById('total-protein');
+    const totalCarbsSpan = document.getElementById('total-carbs');
+    const totalFatSpan = document.getElementById('total-fat');
+    const mealsListUl = document.getElementById('meals-list');
 
     // --- CONFIGURACIÓN ---
-    // Reemplaza 'YOUR_USDA_API_KEY' con tu clave API real de USDA FoodData Central
-    const USDA_API_KEY = 'J3vt0lhEQv2gnTa558QTcd4ECtxfZWkbe6xoivog';
+    const USDA_API_KEY = 'J3vt0lhEQv2gnTa558QTcd4ECtxfZWkbe6xoivog'; // REMEMBER TO REPLACE WITH YOUR ACTUAL KEY
     const USDA_API_URL = 'https://api.nal.usda.gov/fdc/v1/foods/search';
-    const FLASK_BACKEND_URL = 'http://127.0.0.1:5001/agregar_comida';
+    const FLASK_BACKEND_ADD_URL = 'http://127.0.0.1:5001/agregar_comida';
+    const FLASK_BACKEND_GET_TODAY_URL = 'http://127.0.0.1:5001/obtener_comidas_del_dia';
 
-    let selectedFood = null; // Para almacenar los datos del alimento seleccionado
+    let selectedFood = null;
 
     // --- FUNCIONES ---
 
@@ -74,11 +81,9 @@ document.addEventListener('DOMContentLoaded', () => {
         selectedFood = null; // Resetear el alimento seleccionado
 
         try {
-            // Obtener detalles nutricionales completos del alimento seleccionado
             const response = await fetch(`https://api.nal.usda.gov/fdc/v1/food/${food.fdcId}?api_key=${USDA_API_KEY}`);
             const data = await response.json();
 
-            // Buscar los macronutrientes principales (proteínas, grasas, carbohidratos)
             const nutrients = data.foodNutrients;
             let calories = 0;
             let protein = 0;
@@ -119,7 +124,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function displayMacroInfo() {
         if (selectedFood) {
             const quantity = parseFloat(quantityInput.value) || 100;
-            const factor = quantity / 100; // La API da valores por 100g
+            const factor = quantity / 100;
 
             macroInfoDiv.innerHTML = `
                 <h3>Información Nutricional (por ${quantity}g):</h3>
@@ -136,7 +141,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Función para enviar los datos al backend de Flask
     async function sendFoodData(foodData) {
         try {
-            const response = await fetch(FLASK_BACKEND_URL, {
+            const response = await fetch(FLASK_BACKEND_ADD_URL, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -146,15 +151,58 @@ document.addEventListener('DOMContentLoaded', () => {
             const result = await response.json();
             if (response.ok) {
                 alert('Comida registrada exitosamente: ' + result.message);
-                foodForm.reset(); // Limpiar el formulario
-                macroInfoDiv.innerHTML = ''; // Limpiar info de macros
-                selectedFood = null; // Resetear alimento seleccionado
+                foodForm.reset();
+                macroInfoDiv.innerHTML = '';
+                selectedFood = null;
+                fetchTodayMeals(); // Refresh today's meals and summary
             } else {
                 alert('Error al registrar comida: ' + result.error);
             }
         } catch (error) {
             console.error('Error enviando datos al backend:', error);
             alert('Error de conexión con el servidor.');
+        }
+    }
+
+    // Función para obtener y mostrar las comidas del día
+    async function fetchTodayMeals() {
+        try {
+            const response = await fetch(FLASK_BACKEND_GET_TODAY_URL);
+            const meals = await response.json();
+
+            mealsListUl.innerHTML = ''; // Clear previous list
+            let totalCalories = 0;
+            let totalProtein = 0;
+            let totalCarbs = 0;
+            let totalFat = 0;
+
+            if (meals && meals.length > 0) {
+                meals.forEach(meal => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `<strong>${meal.tipo_comida}</strong>: ${meal.alimento} (${meal.cantidad}g) - ${meal.calorias} kcal, ${meal.proteinas}g P, ${meal.carbohidratos}g C, ${meal.grasas}g G`;
+                    mealsListUl.appendChild(li);
+
+                    totalCalories += parseFloat(meal.calorias);
+                    totalProtein += parseFloat(meal.proteinas);
+                    totalCarbs += parseFloat(meal.carbohidratos);
+                    totalFat += parseFloat(meal.grasas);
+                });
+            } else {
+                mealsListUl.innerHTML = '<li>No hay comidas registradas para hoy.</li>';
+            }
+
+            totalCaloriesSpan.textContent = totalCalories.toFixed(2);
+            totalProteinSpan.textContent = totalProtein.toFixed(2);
+            totalCarbsSpan.textContent = totalCarbs.toFixed(2);
+            totalFatSpan.textContent = totalFat.toFixed(2);
+
+        } catch (error) {
+            console.error('Error obteniendo comidas del día:', error);
+            mealsListUl.innerHTML = '<li style="color: red;">Error al cargar comidas del día.</li>';
+            totalCaloriesSpan.textContent = 'Error';
+            totalProteinSpan.textContent = 'Error';
+            totalCarbsSpan.textContent = 'Error';
+            totalFatSpan.textContent = 'Error';
         }
     }
 
@@ -167,7 +215,7 @@ document.addEventListener('DOMContentLoaded', () => {
     quantityInput.addEventListener('input', displayMacroInfo);
 
     foodForm.addEventListener('submit', (event) => {
-        event.preventDefault(); // Prevenir el envío tradicional del formulario
+        event.preventDefault();
 
         if (!selectedFood) {
             alert('Por favor, selecciona un alimento de la lista de sugerencias.');
@@ -195,7 +243,10 @@ document.addEventListener('DOMContentLoaded', () => {
         sendFoodData(foodData);
     });
 
-    themeToggleButton.addEventListener('click', toggleTheme); // New event listener
+    themeToggleButton.addEventListener('click', toggleTheme);
+
+    // Initial fetch of today's meals when the page loads
+    fetchTodayMeals();
 
     console.log('Tracker de Macros listo.');
 });
