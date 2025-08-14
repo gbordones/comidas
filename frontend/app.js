@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentDate = new Date(); // Comienza con la fecha de hoy
 
     // --- CONFIGURACIÓN ---
-    const BACKEND_BASE_URL = 'http://localhost:8050';
+    const BACKEND_BASE_URL = 'http://192.168.10.52:8050';
 
     // --- FUNCIONES ---
 
