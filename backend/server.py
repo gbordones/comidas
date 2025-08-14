@@ -174,7 +174,7 @@ def get_user_profile(user_id):
         conn = db_pool.getconn()
         cur = conn.cursor()
         cur.execute(
-            """SELECT id, nombre, email, fecha_nacimiento, sexo, altura_cm, peso_kg, actividad_nivel, objetivo_calorico_diario
+            """SELECT id, nombre, email, fecha_nacimiento, sexo, altura_cm, peso_kg, actividad_nivel, objetivo_calorico_diario, imc, porcentaje_grasa
                FROM usuarios WHERE id = %s""",
             (user_id,)
         )
@@ -220,6 +220,9 @@ def update_user_profile(user_id):
             return jsonify({"error": "Formato de fecha de nacimiento inválido. Use YYYY-MM-DD."}), 400
 
     objetivo_calorico_diario = None
+    imc = None
+    porcentaje_grasa = None
+
     # Ensure age_years is defined before use in the all() check
     # The age_years calculation block is already above this, so it should be defined.
 
@@ -230,6 +233,18 @@ def update_user_profile(user_id):
             objetivo_calorico_diario = calculate_bmr_tdee(sexo, peso_kg, altura_cm, age_years, actividad_nivel)
         except ValueError as e:
             return jsonify({"error": str(e)}), 400
+
+    # Calculate IMC
+    if peso_kg is not None and altura_cm is not None and altura_cm > 0:
+        altura_m = altura_cm / 100
+        imc = peso_kg / (altura_m ** 2)
+
+    # Calculate Body Fat Percentage (simplified formula)
+    if imc is not None and age_years is not None and sexo:
+        if sexo.lower() == 'masculino':
+            porcentaje_grasa = (1.20 * imc) + (0.23 * age_years) - 16.2
+        elif sexo.lower() == 'femenino':
+            porcentaje_grasa = (1.20 * imc) + (0.23 * age_years) - 5.4
 
     conn = None
     try:
@@ -247,6 +262,8 @@ def update_user_profile(user_id):
         if peso_kg is not None: update_fields.append("peso_kg = %s"); update_values.append(peso_kg)
         if actividad_nivel: update_fields.append("actividad_nivel = %s"); update_values.append(actividad_nivel)
         if objetivo_calorico_diario is not None: update_fields.append("objetivo_calorico_diario = %s"); update_values.append(objetivo_calorico_diario)
+        if imc is not None: update_fields.append("imc = %s"); update_values.append(imc)
+        if porcentaje_grasa is not None: update_fields.append("porcentaje_grasa = %s"); update_values.append(porcentaje_grasa)
 
         if not update_fields:
             return jsonify({"message": "No hay datos para actualizar"}), 200

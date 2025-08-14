@@ -33,6 +33,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const dailyGoalCaloriesSpan = document.getElementById('daily-goal-calories');
     const remainingCaloriesSpan = document.getElementById('remaining-calories');
 
+    // Elementos para mostrar IMC y % Grasa en el perfil
+    const profileImcSpan = document.getElementById('profile-imc');
+    const profileBodyFatSpan = document.getElementById('profile-body-fat');
+    const profileDailyGoalSpan = document.getElementById('profile-daily-goal');
+
     // --- ESTADO DE LA APLICACIÓN ---
     let selectedFood = null;
     let currentDate = new Date(); // Comienza con la fecha de hoy
@@ -185,6 +190,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 // Actualizar el objetivo calórico diario en el resumen
                 dailyGoalCaloriesSpan.textContent = (userData.objetivo_calorico_diario || 0).toFixed(0);
+
+                // Mostrar IMC y % Grasa en el modal de perfil
+                profileImcSpan.textContent = (userData.imc !== null && userData.imc !== undefined) ? userData.imc.toFixed(2) : '--';
+                profileBodyFatSpan.textContent = (userData.porcentaje_grasa !== null && userData.porcentaje_grasa !== undefined) ? userData.porcentaje_grasa.toFixed(2) + '%' : '--';
+                profileDailyGoalSpan.textContent = (userData.objetivo_calorico_diario !== null && userData.objetivo_calorico_diario !== undefined) ? userData.objetivo_calorico_diario.toFixed(0) : '--';
+
                 return userData;
             } else {
                 console.error('Error al obtener perfil de usuario:', userData.error);
