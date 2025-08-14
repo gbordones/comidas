@@ -39,31 +39,20 @@ def calculate_bmr_tdee(sex, weight_kg, height_cm, age_years, activity_level):
     elif sex.lower() == 'femenino':
         bmr = (10 * weight_kg) + (6.25 * height_cm) - (5 * age_years) - 161
     else:
-        # Podríamos usar un promedio o lanzar un error
         raise ValueError("Sexo no válido para el cálculo de BMR.")
 
-    # Factores de actividad física (ejemplos, pueden ajustarse)
-    # Sedentario: poco o ningún ejercicio
-    # Ligeramente activo: ejercicio ligero/deportes 1-3 días/semana
-    # Moderadamente activo: ejercicio moderado/deportes 3-5 días/semana
-    # Muy activo: ejercicio intenso/deportes 6-7 días/semana
-    # Extra activo: ejercicio muy intenso/trabajo físico
     activity_factors = {
-        1.2: "sedentario",
-        1.375: "ligeramente_activo",
-        1.55: "moderadamente_activo",
-        1.725: "muy_activo",
-        1.9: "extra_activo"
+        "sedentario": 1.2,
+        "ligeramente_activo": 1.375,
+        "moderadamente_activo": 1.55,
+        "muy_activo": 1.725,
+        "extra_activo": 1.9
     }
     
-    # Invertir el diccionario para buscar el factor por el nombre de la actividad
-    activity_factors_by_name = {v: k for k, v in activity_factors.items()}
-
-    # Asegurarse de que el activity_level proporcionado sea uno de los factores válidos
-    if activity_level not in activity_factors_by_name:
+    if activity_level not in activity_factors:
         raise ValueError("Nivel de actividad no válido.")
     
-    tdee = bmr * activity_factors_by_name[activity_level]
+    tdee = bmr * activity_factors[activity_level]
     return tdee
 
 # --- RUTAS PROXY PARA LA API DE USDA (MÁS SEGURO) ---
@@ -195,7 +184,6 @@ def get_user_profile(user_id):
         if user_data:
             column_names = [desc[0] for desc in cur.description]
             user_dict = dict(zip(column_names, user_data))
-            # Convertir fecha_nacimiento a string si es un objeto date
             if 'fecha_nacimiento' in user_dict and isinstance(user_dict['fecha_nacimiento'], date):
                 user_dict['fecha_nacimiento'] = user_dict['fecha_nacimiento'].isoformat()
             return jsonify(user_dict), 200
@@ -214,7 +202,6 @@ def update_user_profile(user_id):
     if not data:
         return jsonify({"error": "No se recibieron datos JSON"}), 400
 
-    # Validar y obtener datos
     nombre = data.get('nombre')
     email = data.get('email')
     fecha_nacimiento_str = data.get('fecha_nacimiento')
@@ -223,7 +210,6 @@ def update_user_profile(user_id):
     peso_kg = data.get('peso_kg')
     actividad_nivel = data.get('actividad_nivel')
 
-    # Calcular edad
     age_years = None
     if fecha_nacimiento_str:
         try:
@@ -233,7 +219,6 @@ def update_user_profile(user_id):
         except ValueError:
             return jsonify({"error": "Formato de fecha de nacimiento inválido. Use YYYY-MM-DD."}), 400
 
-    # Calcular objetivo calórico diario (TDEE)
     objetivo_calorico_diario = None
     if sexo and peso_kg and altura_cm and age_years and actividad_nivel:
         try:
@@ -261,7 +246,7 @@ def update_user_profile(user_id):
         if not update_fields:
             return jsonify({"message": "No hay datos para actualizar"}), 200
 
-                query = f"UPDATE usuarios SET {', '.join(update_fields)} WHERE id = %s RETURNING id"
+        query = f"UPDATE usuarios SET {', '.join(update_fields)} WHERE id = %s RETURNING id"
         update_values.append(user_id)
 
         cur.execute(query, tuple(update_values))
