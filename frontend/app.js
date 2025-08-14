@@ -21,8 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentDate = new Date(); // Comienza con la fecha de hoy
 
     // --- CONFIGURACIÓN ---
-    // La URL del backend ahora es relativa, no depende de una IP fija.
-    const BACKEND_BASE_URL = ''; // Se asume que el frontend se sirve desde el mismo host que el backend
+    const BACKEND_BASE_URL = 'http://localhost:8050';
 
     // --- FUNCIONES ---
 
