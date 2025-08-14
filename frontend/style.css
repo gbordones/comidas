@@ -1,232 +1,295 @@
+/* --- FUENTE E IMPORTACIONES --- */
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap');
+
+/* --- VARIABLES DE TEMA (PALETA YAZIO) --- */
 :root {
-    --background-color: #f4f4f9;
-    --text-color: #333;
-    --card-background: #fff;
-    --border-color: #ccc;
-    --button-background: #007bff;
-    --button-hover-background: #0056b3;
-    --suggestions-hover-background: #f0f0f0;
-    --shadow-color: rgba(0,0,0,0.1);
+    --green-accent: #73c564;
+    --green-accent-dark: #5da050;
+    --background-light: #f5f7fa;
+    --card-background-light: #ffffff;
+    --text-primary-light: #2c3e50;
+    --text-secondary-light: #7f8c8d;
+    --border-light: #e0e6ed;
+
+    --background-dark: #2c3e50;
+    --card-background-dark: #34495e;
+    --text-primary-dark: #ecf0f1;
+    --text-secondary-dark: #bdc3c7;
+    --border-dark: #4a627a;
+
+    --shadow-color: rgba(44, 62, 80, 0.1);
+    --font-family: 'Nunito', sans-serif;
+}
+
+/* --- ESTILOS BASE --- */
+body {
+    font-family: var(--font-family);
+    margin: 0;
+    background-color: var(--background-light);
+    color: var(--text-primary-light);
+    transition: background-color 0.3s, color 0.3s;
 }
 
 body.dark-mode {
-    --background-color: #282c34;
-    --text-color: #e0e0e0;
-    --card-background: #3a3f47;
-    --border-color: #555;
-    --button-background: #61dafb;
-    --button-hover-background: #21a1f1;
-    --suggestions-hover-background: #4a4f57;
-    --shadow-color: rgba(0,0,0,0.3);
+    background-color: var(--background-dark);
+    color: var(--text-primary-dark);
 }
 
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: var(--background-color);
-    color: var(--text-color);
-    margin: 0;
-    padding: 20px;
+/* --- CABECERA --- */
+.main-header {
+    background-color: var(--card-background-light);
+    padding: 1rem 2rem;
+    box-shadow: 0 2px 4px var(--shadow-color);
     display: flex;
-    flex-direction: column; /* Changed to column for better layout with toggle */
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
-    min-height: 100vh;
-    transition: background-color 0.3s ease, color 0.3s ease;
-}
-
-.container {
-    background: var(--card-background);
-    padding: 2em;
-    border-radius: 10px;
-    box-shadow: 0 8px 16px var(--shadow-color);
     width: 100%;
-    max-width: 550px;
-    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    box-sizing: border-box;
+    z-index: 100;
 }
 
-h1 {
-    text-align: center;
-    color: var(--text-color);
-    margin-bottom: 1.5em;
-    transition: color 0.3s ease;
+body.dark-mode .main-header {
+    background-color: var(--card-background-dark);
 }
 
+.main-header h1 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+/* --- LAYOUT PRINCIPAL (GRID) --- */
+.main-content {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 2rem;
+    padding: 2rem;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    box-sizing: border-box;
+}
+
+/* --- TARJETAS (CARDS) --- */
+.card {
+    background-color: var(--card-background-light);
+    border-radius: 16px;
+    padding: 1.5rem 2rem;
+    box-shadow: 0 4px 12px var(--shadow-color);
+    transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+body.dark-mode .card {
+    background-color: var(--card-background-dark);
+}
+
+.card h2 {
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-primary-light);
+}
+
+body.dark-mode .card h2 {
+    color: var(--text-primary-dark);
+}
+
+/* --- FORMULARIO --- */
 .form-group {
-    margin-bottom: 1.5em;
+    margin-bottom: 1rem;
 }
 
 label {
     display: block;
-    margin-bottom: 0.6em;
-    font-weight: bold;
-    color: var(--text-color);
-    transition: color 0.3s ease;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--text-secondary-light);
 }
 
-input[type="text"],
-input[type="number"],
-select {
+body.dark-mode label {
+    color: var(--text-secondary-dark);
+}
+
+input[type="text"], input[type="number"], select {
     width: 100%;
-    padding: 0.9em;
-    border: 1px solid var(--border-color);
-    border-radius: 6px;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border-light);
+    border-radius: 8px;
     box-sizing: border-box;
-    background-color: var(--card-background);
-    color: var(--text-color);
-    transition: border-color 0.3s ease, background-color 0.3s ease, color 0.3s ease;
+    background-color: var(--background-light);
+    color: var(--text-primary-light);
+    font-family: var(--font-family);
+    font-size: 1rem;
 }
 
-input[type="text"]:focus,
-input[type="number"]:focus,
-select:focus {
+body.dark-mode input[type="text"], body.dark-mode input[type="number"], body.dark-mode select {
+    background-color: var(--background-dark);
+    color: var(--text-primary-dark);
+    border-color: var(--border-dark);
+}
+
+input:focus, select:focus {
     outline: none;
-    border-color: var(--button-background);
-    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+    border-color: var(--green-accent);
+    box-shadow: 0 0 0 3px rgba(115, 197, 100, 0.2);
 }
 
-button {
+/* --- BOTONES --- */
+.button-primary {
     width: 100%;
-    padding: 1em;
+    padding: 0.8rem;
     border: none;
-    background-color: var(--button-background);
+    background-color: var(--green-accent);
     color: white;
-    border-radius: 6px;
-    font-size: 1.1em;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 700;
     cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-    margin-top: 1em;
+    transition: background-color 0.2s;
+    margin-top: 1rem;
 }
 
-button:hover {
-    background-color: var(--button-hover-background);
-    transform: translateY(-2px);
+.button-primary:hover {
+    background-color: var(--green-accent-dark);
 }
 
-button:active {
-    transform: translateY(0);
+#theme-toggle {
+    padding: 0.5rem 1rem;
+    background-color: var(--border-light);
+    color: var(--text-secondary-light);
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 600;
 }
 
+body.dark-mode #theme-toggle {
+    background-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+}
+
+/* --- NAVEGACIÓN DE FECHA --- */
+#date-navigation {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+#date-navigation h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    text-align: center;
+}
+
+.button-icon {
+    background: none;
+    border: 1px solid var(--border-light);
+    color: var(--text-secondary-light);
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    cursor: pointer;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+body.dark-mode .button-icon {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+}
+
+/* --- RESUMEN DIARIO --- */
+#daily-summary {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.summary-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.summary-item span {
+    font-size: 0.9rem;
+    color: var(--text-secondary-light);
+}
+
+body.dark-mode .summary-item span {
+    color: var(--text-secondary-dark);
+}
+
+.summary-item strong {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--green-accent);
+}
+
+/* --- LISTA DE COMIDAS --- */
+#meals-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+#meals-list li {
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--border-light);
+}
+
+body.dark-mode #meals-list li {
+    border-bottom-color: var(--border-dark);
+}
+
+#meals-list li:last-child {
+    border-bottom: none;
+}
+
+/* --- SUGERENCIAS DE BÚSQUEDA --- */
 #suggestions {
-    border: 1px solid var(--border-color);
+    border: 1px solid var(--border-light);
     border-top: none;
     max-height: 180px;
     overflow-y: auto;
-    background-color: var(--card-background);
-    border-bottom-left-radius: 6px;
-    border-bottom-right-radius: 6px;
-    z-index: 10; /* Ensure suggestions are above other elements */
-    position: relative; /* Needed for z-index to work */
+    background-color: var(--card-background-light);
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+}
+
+body.dark-mode #suggestions {
+    background-color: var(--card-background-dark);
+    border-color: var(--border-dark);
 }
 
 #suggestions div {
     padding: 10px;
     cursor: pointer;
-    color: var(--text-color);
-    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 #suggestions div:hover {
-    background-color: var(--suggestions-hover-background);
+    background-color: var(--background-light);
 }
 
-#macro-info {
-    margin-top: 1.5em;
-    padding: 1em;
-    background-color: var(--suggestions-hover-background); /* Lighter background for info */
-    border-radius: 8px;
-    border: 1px solid var(--border-color);
-    transition: background-color 0.3s ease, border-color 0.3s ease;
+body.dark-mode #suggestions div:hover {
+    background-color: var(--background-dark);
 }
 
-#macro-info h3 {
-    margin-top: 0;
-    color: var(--text-color);
-    transition: color 0.3s ease;
-}
-
-#macro-info p {
-    margin: 0.5em 0;
-    color: var(--text-color);
-    transition: color 0.3s ease;
-}
-
-.theme-toggle-container {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    z-index: 100;
-}
-
-#theme-toggle {
-    width: auto;
-    padding: 0.8em 1.5em;
-    font-size: 0.9em;
-    margin-top: 0;
-    background-color: var(--button-background);
-    color: white;
-    border-radius: 20px;
-    box-shadow: 0 2px 4px var(--shadow-color);
-}
-
-#theme-toggle:hover {
-    background-color: var(--button-hover-background);
-    transform: translateY(-1px);
-}
-
-#daily-summary, #today-meals {
-    background: var(--card-.background);
-    padding: 1.5em;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px var(--shadow-color);
-    margin-top: 2em;
-    width: 100%;
-    max-width: 550px;
-    transition: background-color 0.3s ease, box-shadow 0.3s ease;
-}
-
-#daily-summary h2, #today-meals h2 {
-    text-align: center;
-    color: var(--text-color);
-    margin-top: 0;
-    margin-bottom: 1em;
-    transition: color 0.3s ease;
-}
-
-#daily-summary p {
-    margin: 0.5em 0;
-    font-size: 1.1em;
-    color: var(--text-color);
-    transition: color 0.3s ease;
-}
-
-#daily-summary strong {
-    font-weight: bold;
-    color: var(--button-background); /* Highlight with accent color */
-    transition: color 0.3s ease;
-}
-
-#meals-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-#meals-list li {
-    background-color: var(--suggestions-hover-background); /* Use a slightly different background */
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    padding: 1em;
-    margin-bottom: 0.8em;
-    font-size: 0.95em;
-    color: var(--text-color);
-    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
-}
-
-#meals-list li:last-child {
-    margin-bottom: 0;
-}
-
-#meals-list li strong {
-    color: var(--button-background);
-    transition: color 0.3s ease;
+/* --- RESPONSIVE DESIGN --- */
+@media (max-width: 900px) {
+    .main-content {
+        grid-template-columns: 1fr;
+    }
+    .main-header {
+        flex-direction: column;
+        gap: 1rem;
+    }
 }

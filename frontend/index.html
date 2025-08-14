@@ -4,59 +4,84 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tracker de Macronutrientes</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="theme-toggle-container">
+    <header class="main-header">
+        <h1>Mi Diario de Nutrición</h1>
         <button id="theme-toggle">Cambiar Tema</button>
-    </div>
-    <div class="container">
-        <h1>Registro de Comidas</h1>
-        <form id="food-form">
-            <div class="form-group">
-                <label for="food-name">Alimento:</label>
-                <input type="text" id="food-name" name="food-name" required autocomplete="off">
-                <div id="suggestions"></div>
-            </div>
-            <div class="form-group">
-                <label for="quantity">Cantidad (en gramos):</label>
-                <input type="number" id="quantity" name="quantity" value="100" required>
-            </div>
-            <div class="form-group">
-                <label for="meal-type">Tipo de Comida:</label>
-                <select id="meal-type" name="meal-type">
-                    <option value="Desayuno">Desayuno</option>
-                    <option value="Almuerzo">Almuerzo</option>
-                    <option value="Cena">Cena</option>
-                    <option value="Snack">Snack</option>
-                </select>
-            </div>
-            <div id="macro-info">
-                <!-- La información de macros se mostrará aquí -->
-            </div>
-            <button type="submit">Añadir Comida</button>
-        </form>
+    </header>
 
-        <div id="daily-summary">
-            <h2>Resumen del Día</h2>
-            <div id="date-navigation">
-                <button id="prev-day-btn">&lt; Día Anterior</button>
-                <h3 id="current-date-display"></h3>
-                <button id="next-day-btn">Día Siguiente &gt;</button>
-            </div>
-            <p>Calorías Totales: <strong id="total-calories">0</strong> kcal</p>
-            <p>Proteínas Totales: <strong id="total-protein">0</strong> g</p>
-            <p>Carbohidratos Totales: <strong id="total-carbs">0</strong> g</p>
-            <p>Grasas Totales: <strong id="total-fat">0</strong> g</p>
+    <div class="main-content">
+        <!-- Columna Izquierda: Formulario -->
+        <div class="card form-card">
+            <h2>Añadir Comida</h2>
+            <form id="food-form">
+                <div class="form-group">
+                    <label for="food-name">Alimento:</label>
+                    <input type="text" id="food-name" name="food-name" required autocomplete="off" placeholder="Ej: Pechuga de pollo">
+                    <div id="suggestions"></div>
+                </div>
+                <div class="form-group">
+                    <label for="quantity">Cantidad (gramos):</label>
+                    <input type="number" id="quantity" name="quantity" value="100" required>
+                </div>
+                <div class="form-group">
+                    <label for="meal-type">Tipo de Comida:</label>
+                    <select id="meal-type" name="meal-type">
+                        <option value="Desayuno">Desayuno</option>
+                        <option value="Almuerzo">Almuerzo</option>
+                        <option value="Cena">Cena</option>
+                        <option value="Snack">Snack</option>
+                    </select>
+                </div>
+                <div id="macro-info">
+                    <!-- La información de macros se mostrará aquí -->
+                </div>
+                <button type="submit" class="button-primary">Añadir Comida</button>
+            </form>
         </div>
 
-        <div id="today-meals">
-            <h2>Comidas Registradas</h2>
-            <ul id="meals-list">
-                <!-- Meals will be listed here -->
-            </ul>
+        <!-- Columna Derecha: Resumen y Comidas -->
+        <div class="dashboard-column">
+            <div class="card summary-card">
+                <div id="date-navigation">
+                    <button id="prev-day-btn" class="button-icon">&lt;</button>
+                    <h3 id="current-date-display"></h3>
+                    <button id="next-day-btn" class="button-icon">&gt;</button>
+                </div>
+                <div id="daily-summary">
+                    <div class="summary-item">
+                        <span>Calorías</span>
+                        <strong id="total-calories">0</strong>
+                    </div>
+                    <div class="summary-item">
+                        <span>Proteínas</span>
+                        <strong id="total-protein">0 g</strong>
+                    </div>
+                    <div class="summary-item">
+                        <span>Carbs</span>
+                        <strong id="total-carbs">0 g</strong>
+                    </div>
+                    <div class="summary-item">
+                        <span>Grasas</span>
+                        <strong id="total-fat">0 g</strong>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card meals-card">
+                <h2>Comidas Registradas</h2>
+                <ul id="meals-list">
+                    <!-- Las comidas se listarán aquí -->
+                </ul>
+            </div>
         </div>
     </div>
+
     <script src="app.js"></script>
 </body>
 </html>
