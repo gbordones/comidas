@@ -15,10 +15,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const mealsListUl = document.getElementById('meals-list');
 
     // --- CONFIGURACIÓN ---
-    const USDA_API_KEY = 'J3vt0lhEQv2gnTa558QTcd4ECtxfZWkbe6xoivog'; // REMEMBER TO REPLACE WITH YOUR ACTUAL KEY
+    const USDA_API_KEY = 'J3vt0lhEQv2gnTa558QTcd4ECtxfZWkbe6xoivog'; 
     const USDA_API_URL = 'https://api.nal.usda.gov/fdc/v1/foods/search';
-    const FLASK_BACKEND_ADD_URL = 'http://localhost:8050/agregar_comida';
-    const FLASK_BACKEND_GET_TODAY_URL = 'http://localhost:8050/obtener_comidas_del_dia';
+    const FLASK_BACKEND_ADD_URL = 'http://192.168.10.52:8050/agregar_comida';
+    const FLASK_BACKEND_GET_TODAY_URL = 'http://192.168.10.52:8050/obtener_comidas_del_dia';
 
     let selectedFood = null;
 
