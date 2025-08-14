@@ -12,7 +12,10 @@
 <body>
     <header class="main-header">
         <h1>Mi Diario de Nutrición</h1>
-        <button id="theme-toggle">Cambiar Tema</button>
+        <div class="header-actions">
+            <button id="profile-button" class="button-secondary">Mi Perfil</button>
+            <button id="theme-toggle" class="button-secondary">Cambiar Tema</button>
+        </div>
     </header>
 
     <div class="main-content">
@@ -55,8 +58,16 @@
                 </div>
                 <div id="daily-summary">
                     <div class="summary-item">
-                        <span>Calorías</span>
-                        <strong id="total-calories">0</strong>
+                        <span>Calorías Consumidas</span>
+                        <strong id="total-calories">0</strong> kcal
+                    </div>
+                    <div class="summary-item">
+                        <span>Objetivo Diario</span>
+                        <strong id="daily-goal-calories">0</strong> kcal
+                    </div>
+                    <div class="summary-item">
+                        <span>Calorías Restantes</span>
+                        <strong id="remaining-calories">0</strong> kcal
                     </div>
                     <div class="summary-item">
                         <span>Proteínas</span>
@@ -79,6 +90,56 @@
                     <!-- Las comidas se listarán aquí -->
                 </ul>
             </div>
+        </div>
+    </div>
+
+    <!-- Modal de Perfil de Usuario -->
+    <div id="profile-modal" class="modal">
+        <div class="modal-content card">
+            <span class="close-button">&times;</span>
+            <h2>Mi Perfil</h2>
+            <form id="profile-form">
+                <div class="form-group">
+                    <label for="profile-name">Nombre:</label>
+                    <input type="text" id="profile-name" name="nombre" required>
+                </div>
+                <div class="form-group">
+                    <label for="profile-email">Email:</label>
+                    <input type="email" id="profile-email" name="email">
+                </div>
+                <div class="form-group">
+                    <label for="profile-dob">Fecha de Nacimiento:</label>
+                    <input type="date" id="profile-dob" name="fecha_nacimiento" required>
+                </div>
+                <div class="form-group">
+                    <label for="profile-sex">Sexo:</label>
+                    <select id="profile-sex" name="sexo" required>
+                        <option value="">Selecciona</option>
+                        <option value="masculino">Masculino</option>
+                        <option value="femenino">Femenino</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="profile-height">Altura (cm):</label>
+                    <input type="number" id="profile-height" name="altura_cm" required min="50" max="250">
+                </div>
+                <div class="form-group">
+                    <label for="profile-weight">Peso (kg):</label>
+                    <input type="number" id="profile-weight" name="peso_kg" required min="20" max="300">
+                </div>
+                <div class="form-group">
+                    <label for="profile-activity">Nivel de Actividad:</label>
+                    <select id="profile-activity" name="actividad_nivel" required>
+                        <option value="">Selecciona</option>
+                        <option value="sedentario">Sedentario (poco o ningún ejercicio)</option>
+                        <option value="ligeramente_activo">Ligeramente activo (ejercicio ligero 1-3 días/sem)</option>
+                        <option value="moderadamente_activo">Moderadamente activo (ejercicio moderado 3-5 días/sem)</option>
+                        <option value="muy_activo">Muy activo (ejercicio intenso 6-7 días/sem)</option>
+                        <option value="extra_activo">Extra activo (ejercicio muy intenso/trabajo físico)</option>
+                    </select>
+                </div>
+                <button type="submit" class="button-primary">Guardar Perfil</button>
+            </form>
         </div>
     </div>
 

@@ -58,6 +58,11 @@ body.dark-mode .main-header {
     font-weight: 700;
 }
 
+.header-actions {
+    display: flex;
+    gap: 10px;
+}
+
 /* --- LAYOUT PRINCIPAL (GRID) --- */
 .main-content {
     display: grid;
@@ -112,7 +117,11 @@ body.dark-mode label {
     color: var(--text-secondary-dark);
 }
 
-input[type="text"], input[type="number"], select {
+input[type="text"],
+input[type="number"],
+input[type="email"],
+input[type="date"],
+select {
     width: 100%;
     padding: 0.75rem 1rem;
     border: 1px solid var(--border-light);
@@ -124,7 +133,11 @@ input[type="text"], input[type="number"], select {
     font-size: 1rem;
 }
 
-body.dark-mode input[type="text"], body.dark-mode input[type="number"], body.dark-mode select {
+body.dark-mode input[type="text"],
+body.dark-mode input[type="number"],
+body.dark-mode input[type="email"],
+body.dark-mode input[type="date"],
+body.dark-mode select {
     background-color: var(--background-dark);
     color: var(--text-primary-dark);
     border-color: var(--border-dark);
@@ -155,20 +168,30 @@ input:focus, select:focus {
     background-color: var(--green-accent-dark);
 }
 
-#theme-toggle {
+.button-secondary {
     padding: 0.5rem 1rem;
     background-color: var(--border-light);
     color: var(--text-secondary-light);
     border: none;
-    border-radius: 20px;
+    border-radius: 8px;
     cursor: pointer;
-    font-size: 0.8rem;
+    font-size: 0.9rem;
     font-weight: 600;
+    transition: background-color 0.2s, color 0.2s;
 }
 
-body.dark-mode #theme-toggle {
+body.dark-mode .button-secondary {
     background-color: var(--border-dark);
     color: var(--text-secondary-dark);
+}
+
+.button-secondary:hover {
+    background-color: var(--green-accent);
+    color: white;
+}
+
+#theme-toggle {
+    /* Estilos específicos si los necesita, pero ya cubierto por .button-secondary */
 }
 
 /* --- NAVEGACIÓN DE FECHA --- */
@@ -208,7 +231,7 @@ body.dark-mode .button-icon {
 /* --- RESUMEN DIARIO --- */
 #daily-summary {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(2, 1fr); /* 2 columnas para los items */
     gap: 1rem;
 }
 
@@ -281,6 +304,59 @@ body.dark-mode #suggestions {
 
 body.dark-mode #suggestions div:hover {
     background-color: var(--background-dark);
+}
+
+/* --- MODAL DE PERFIL --- */
+.modal {
+    display: none; /* Oculto por defecto */
+    position: fixed; /* Permanece en su lugar */
+    z-index: 1; /* Se sitúa por encima de todo */
+    left: 0;
+    top: 0;
+    width: 100%; /* Ancho completo */
+    height: 100%; /* Alto completo */
+    overflow: auto; /* Habilitar scroll si es necesario */
+    background-color: rgba(0,0,0,0.4); /* Fondo oscuro semi-transparente */
+    display: flex; /* Para centrar el contenido */
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    position: relative;
+    margin: auto;
+    padding: 20px;
+    border-radius: 16px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    animation-name: animatemodal; /* Animación de entrada */
+    animation-duration: 0.4s
+}
+
+.close-button {
+    color: var(--text-secondary-light);
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close-button:hover,
+.close-button:focus {
+    color: var(--green-accent);
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* Animación de entrada del modal */
+@-webkit-keyframes animatemodal {
+    from {top: -300px; opacity: 0}
+    to {top: 0; opacity: 1}
+}
+
+@keyframes animatemodal {
+    from {top: -300px; opacity: 0}
+    to {top: 0; opacity: 1}
 }
 
 /* --- RESPONSIVE DESIGN --- */

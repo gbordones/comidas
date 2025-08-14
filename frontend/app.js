@@ -16,24 +16,39 @@ document.addEventListener('DOMContentLoaded', () => {
     const nextDayBtn = document.getElementById('next-day-btn');
     const currentDateDisplay = document.getElementById('current-date-display');
 
+    // Nuevos elementos para el perfil de usuario
+    const profileButton = document.getElementById('profile-button');
+    const profileModal = document.getElementById('profile-modal');
+    const closeButton = profileModal.querySelector('.close-button');
+    const profileForm = document.getElementById('profile-form');
+    const profileNameInput = document.getElementById('profile-name');
+    const profileEmailInput = document.getElementById('profile-email');
+    const profileDobInput = document.getElementById('profile-dob');
+    const profileSexSelect = document.getElementById('profile-sex');
+    const profileHeightInput = document.getElementById('profile-height');
+    const profileWeightInput = document.getElementById('profile-weight');
+    const profileActivitySelect = document.getElementById('profile-activity');
+
+    // Nuevos elementos para el resumen de calorías
+    const dailyGoalCaloriesSpan = document.getElementById('daily-goal-calories');
+    const remainingCaloriesSpan = document.getElementById('remaining-calories');
+
     // --- ESTADO DE LA APLICACIÓN ---
     let selectedFood = null;
     let currentDate = new Date(); // Comienza con la fecha de hoy
+    const USER_ID = 1; // ID de usuario temporalmente fijo
 
     // --- CONFIGURACIÓN ---
     const BACKEND_BASE_URL = 'http://192.168.10.52:8050';
 
-    // --- FUNCIONES ---
+    // --- FUNCIONES GENERALES ---
 
-    // Formatea un objeto Date a un string 'YYYY-MM-DD'
     function formatDate(date) {
         return date.toISOString().split('T')[0];
     }
 
-    // Actualiza el h3 que muestra la fecha
     function updateDateDisplay() {
         const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-        // Formato especial para el día de hoy
         if (formatDate(currentDate) === formatDate(new Date())) {
             currentDateDisplay.textContent = `Hoy, ${currentDate.toLocaleDateString('es-ES', options)}`;
         } else {
@@ -41,7 +56,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Cambia el tema (claro/oscuro)
     function setTheme(theme) {
         document.body.classList.remove('light-mode', 'dark-mode');
         document.body.classList.add(theme);
@@ -54,14 +68,14 @@ document.addEventListener('DOMContentLoaded', () => {
         setTheme(newTheme);
     }
 
-    // Busca alimentos usando nuestro propio backend como proxy
+    // --- FUNCIONES DE ALIMENTOS ---
+
     async function searchFood(query) {
         if (query.length < 3) {
             suggestionsDiv.innerHTML = '';
             return;
         }
         try {
-            // La petición ahora va a nuestro backend, que es más seguro
             const response = await fetch(`${BACKEND_BASE_URL}/buscar_alimento?query=${query}`);
             const data = await response.json();
             displaySuggestions(data.foods);
@@ -71,7 +85,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Muestra las sugerencias de alimentos
     function displaySuggestions(foods) {
         suggestionsDiv.innerHTML = '';
         if (foods && foods.length > 0) {
@@ -86,14 +99,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Selecciona un alimento y obtiene sus macros
     async function selectFood(food) {
         foodNameInput.value = food.description;
         suggestionsDiv.innerHTML = '';
         selectedFood = null;
 
         try {
-            // La petición de detalles también va a nuestro backend
             const response = await fetch(`${BACKEND_BASE_URL}/detalles_alimento?fdcId=${food.fdcId}`);
             const nutrientData = await response.json();
 
@@ -112,7 +123,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Muestra la info de macros para el alimento seleccionado
     function displayMacroInfo() {
         if (selectedFood) {
             const quantity = parseFloat(quantityInput.value) || 100;
@@ -129,7 +139,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Envía una nueva comida al backend
     async function sendFoodData(foodData) {
         try {
             const response = await fetch(`${BACKEND_BASE_URL}/agregar_comida`, {
@@ -153,17 +162,93 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Obtiene y muestra las comidas para la fecha seleccionada (reemplaza a fetchTodayMeals)
+    // --- FUNCIONES DE PERFIL DE USUARIO ---
+
+    async function fetchUserProfile() {
+        try {
+            const response = await fetch(`${BACKEND_BASE_URL}/api/users/${USER_ID}`);
+            if (response.status === 404) {
+                // Usuario no encontrado, puede que sea la primera vez. No hay problema.
+                console.log("Usuario no encontrado, asumiendo primer uso.");
+                return null;
+            }
+            const userData = await response.json();
+            if (response.ok) {
+                // Rellenar el formulario de perfil
+                profileNameInput.value = userData.nombre || '';
+                profileEmailInput.value = userData.email || '';
+                profileDobInput.value = userData.fecha_nacimiento || '';
+                profileSexSelect.value = userData.sexo || '';
+                profileHeightInput.value = userData.altura_cm || '';
+                profileWeightInput.value = userData.peso_kg || '';
+                profileActivitySelect.value = userData.actividad_nivel || '';
+                
+                // Actualizar el objetivo calórico diario en el resumen
+                dailyGoalCaloriesSpan.textContent = (userData.objetivo_calorico_diario || 0).toFixed(0);
+                return userData;
+            } else {
+                console.error('Error al obtener perfil de usuario:', userData.error);
+                return null;
+            }
+        } catch (error) {
+            console.error('Error de conexión al obtener perfil de usuario:', error);
+            return null;
+        }
+    }
+
+    async function saveUserProfile(event) {
+        event.preventDefault();
+
+        const userData = {
+            nombre: profileNameInput.value,
+            email: profileEmailInput.value,
+            fecha_nacimiento: profileDobInput.value,
+            sexo: profileSexSelect.value,
+            altura_cm: parseFloat(profileHeightInput.value),
+            peso_kg: parseFloat(profileWeightInput.value),
+            actividad_nivel: profileActivitySelect.value
+        };
+
+        try {
+            const response = await fetch(`${BACKEND_BASE_URL}/api/users/${USER_ID}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(userData),
+            });
+            const result = await response.json();
+            if (response.ok) {
+                alert('Perfil actualizado exitosamente!');
+                profileModal.style.display = 'none'; // Cerrar modal
+                fetchUserProfile(); // Recargar perfil para actualizar el objetivo calórico
+                fetchMealsForDate(); // Recalcular calorías restantes
+            } else {
+                alert('Error al guardar perfil: ' + result.error);
+            }
+        } catch (error) {
+            console.error('Error de conexión al guardar perfil:', error);
+            alert('Error de conexión con el servidor al guardar perfil.');
+        }
+    }
+
+    // --- FUNCIONES DE RESUMEN DIARIO Y COMIDAS ---
+
     async function fetchMealsForDate() {
         updateDateDisplay();
         const dateStr = formatDate(currentDate);
+
+        let userProfile = await fetchUserProfile(); // Obtener perfil para el objetivo calórico
+        let dailyGoal = userProfile ? userProfile.objetivo_calorico_diario || 0 : 0;
+        dailyGoalCaloriesSpan.textContent = dailyGoal.toFixed(0);
 
         try {
             const response = await fetch(`${BACKEND_BASE_URL}/obtener_comidas_del_dia?fecha=${dateStr}`);
             const meals = await response.json();
 
             mealsListUl.innerHTML = '';
-            let totalCalories = 0, totalProtein = 0, totalCarbs = 0, totalFat = 0;
+            let totalCalories = 0;
+            let totalProtein = 0;
+            let totalCarbs = 0;
+            let totalFat = 0;
 
             if (meals && meals.length > 0) {
                 meals.forEach(meal => {
@@ -184,9 +269,18 @@ document.addEventListener('DOMContentLoaded', () => {
             totalCarbsSpan.textContent = totalCarbs.toFixed(2);
             totalFatSpan.textContent = totalFat.toFixed(2);
 
+            // Calcular y mostrar calorías restantes
+            const remainingCalories = dailyGoal - totalCalories;
+            remainingCaloriesSpan.textContent = remainingCalories.toFixed(0);
+
         } catch (error) {
             console.error('Error obteniendo comidas:', error);
             mealsListUl.innerHTML = '<li style="color: red;">Error al cargar las comidas.</li>';
+            totalCaloriesSpan.textContent = 'Error';
+            totalProteinSpan.textContent = 'Error';
+            totalCarbsSpan.textContent = 'Error';
+            totalFatSpan.textContent = 'Error';
+            remainingCaloriesSpan.textContent = 'Error';
         }
     }
 
@@ -209,7 +303,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const factor = quantity / 100;
 
         const foodData = {
-            // Añadimos la fecha al objeto que se envía
             fecha: formatDate(currentDate),
             tipo_comida: mealTypeSelect.value,
             alimento: selectedFood.description,
@@ -234,10 +327,29 @@ document.addEventListener('DOMContentLoaded', () => {
         fetchMealsForDate();
     });
 
+    // Eventos del modal de perfil
+    profileButton.addEventListener('click', () => {
+        profileModal.style.display = 'flex'; // Mostrar modal
+        fetchUserProfile(); // Cargar datos actuales al abrir
+    });
+
+    closeButton.addEventListener('click', () => {
+        profileModal.style.display = 'none'; // Ocultar modal
+    });
+
+    // Cerrar modal si se hace clic fuera del contenido
+    window.addEventListener('click', (event) => {
+        if (event.target == profileModal) {
+            profileModal.style.display = 'none';
+        }
+    });
+
+    profileForm.addEventListener('submit', saveUserProfile);
+
     // --- INICIALIZACIÓN ---
     const savedTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark-mode' : 'light-mode');
     setTheme(savedTheme);
-    fetchMealsForDate(); // Carga inicial de datos para el día de hoy
+    fetchMealsForDate(); // Carga inicial de datos para el día de hoy y perfil
 
-    console.log('Tracker de Macros v2 listo.');
+    console.log('Tracker de Macros v3 listo.');
 });
