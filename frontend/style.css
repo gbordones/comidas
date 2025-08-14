@@ -359,6 +359,34 @@ body.dark-mode #suggestions div:hover {
     to {top: 0; opacity: 1}
 }
 
+/* --- BARRA DE INFORMACIÓN DEL USUARIO --- */
+.user-info-bar {
+    background-color: var(--card-background-light);
+    border-radius: 16px;
+    padding: 1rem 2rem;
+    box-shadow: 0 4px 12px var(--shadow-color);
+    transition: background-color 0.3s, box-shadow 0.3s;
+    margin: 0 auto 2rem auto; /* Centrar y añadir margen inferior */
+    width: calc(100% - 4rem); /* Ajustar al padding */
+    max-width: 1200px; /* Mismo max-width que main-content */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-primary-light);
+}
+
+body.dark-mode .user-info-bar {
+    background-color: var(--card-background-dark);
+    color: var(--text-primary-dark);
+}
+
+.user-info-bar span {
+    white-space: nowrap; /* Evita que el texto se rompa en varias líneas */
+}
+
 /* --- RESPONSIVE DESIGN --- */
 @media (max-width: 900px) {
     .main-content {
@@ -367,5 +395,11 @@ body.dark-mode #suggestions div:hover {
     .main-header {
         flex-direction: column;
         gap: 1rem;
+    }
+    .user-info-bar {
+        flex-direction: column;
+        text-align: center;
+        padding: 1rem;
+        width: calc(100% - 2rem); /* Ajustar al padding */
     }
 }
