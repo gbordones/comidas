@@ -220,9 +220,14 @@ def update_user_profile(user_id):
             return jsonify({"error": "Formato de fecha de nacimiento inválido. Use YYYY-MM-DD."}), 400
 
     objetivo_calorico_diario = None
-    if sexo and peso_kg and altura_cm and age_years and actividad_nivel:
+    # Ensure age_years is defined before use in the all() check
+    # The age_years calculation block is already above this, so it should be defined.
+
+    # Check if all necessary components for TDEE calculation are present and valid
+    if all([sexo, peso_kg is not None, altura_cm is not None, age_years is not None, actividad_nivel]):
         try:
-            objetivo_calorico_diario = calculate_bmr_tdee(sex, peso_kg, altura_cm, age_years, actividad_nivel)
+            # Use 'sexo' variable, not 'sex'
+            objetivo_calorico_diario = calculate_bmr_tdee(sexo, peso_kg, altura_cm, age_years, actividad_nivel)
         except ValueError as e:
             return jsonify({"error": str(e)}), 400
 
