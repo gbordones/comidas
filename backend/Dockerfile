@@ -11,4 +11,4 @@ COPY . .
 # Ensure the initial alimentos.xlsx exists
 COPY alimentos.xlsx .
 
-CMD ["gunicorn", "--workers", "4", "--bind", "0.0.0.0:8050", "--worker-class", "uvicorn.workers.UvicornWorker", "server:app"]
+CMD ["gunicorn", "--workers", "4", "--bind", "0.0.0.0:8050", "server:app"]
