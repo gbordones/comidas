@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  backend:
+    build: ./backend
+    ports:
+      - "8050:8050"
+    volumes:
+      - ./backend/alimentos.xlsx:/app/alimentos.xlsx
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "8051:8051"
+    depends_on:
+      - backend

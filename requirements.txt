@@ -1,4 +1,0 @@
-Flask
-openpyxl
-requests
-flask_cors

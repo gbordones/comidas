@@ -174,7 +174,7 @@ button:active {
 }
 
 #daily-summary, #today-meals {
-    background: var(--card-background);
+    background: var(--card-.background);
     padding: 1.5em;
     border-radius: 10px;
     box-shadow: 0 4px 8px var(--shadow-color);
