@@ -261,7 +261,7 @@ def update_user_profile(user_id):
         if not update_fields:
             return jsonify({"message": "No hay datos para actualizar"}), 200
 
-        query = f"UPDATE usuarios SET {', '.join(update_fields)} WHERE id = %s RETURNING id"
+                query = f"UPDATE usuarios SET {', '.join(update_fields)} WHERE id = %s RETURNING id"
         update_values.append(user_id)
 
         cur.execute(query, tuple(update_values))
