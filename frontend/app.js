@@ -38,6 +38,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const profileBodyFatSpan = document.getElementById('profile-body-fat');
     const profileDailyGoalSpan = document.getElementById('profile-daily-goal');
 
+    // Elementos para mostrar nombre de usuario y edad
+    const displayUsernameSpan = document.getElementById('display-username');
+    const displayUserAgeSpan = document.getElementById('display-user-age');
+
     // --- ESTADO DE LA APLICACIÓN ---
     let selectedFood = null;
     let currentDate = new Date(); // Comienza con la fecha de hoy
@@ -169,6 +173,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- FUNCIONES DE PERFIL DE USUARIO ---
 
+    function calculateAge(dobString) {
+        const dob = new Date(dobString);
+        const today = new Date();
+        let years = today.getFullYear() - dob.getFullYear();
+        let months = today.getMonth() - dob.getMonth();
+
+        if (months < 0 || (months === 0 && today.getDate() < dob.getDate())) {
+            years--;
+            months += 12;
+        }
+        return { years, months };
+    }
+
     async function fetchUserProfile() {
         try {
             const response = await fetch(`${BACKEND_BASE_URL}/api/users/${USER_ID}`);
@@ -195,6 +212,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 profileImcSpan.textContent = (userData.imc !== null && userData.imc !== undefined) ? userData.imc.toFixed(2) : '--';
                 profileBodyFatSpan.textContent = (userData.porcentaje_grasa !== null && userData.porcentaje_grasa !== undefined) ? userData.porcentaje_grasa.toFixed(2) + '%' : '--';
                 profileDailyGoalSpan.textContent = (userData.objetivo_calorico_diario !== null && userData.objetivo_calorico_diario !== undefined) ? userData.objetivo_calorico_diario.toFixed(0) : '--';
+
+                // Mostrar nombre de usuario y edad en la barra superior
+                if (userData.nombre) {
+                    displayUsernameSpan.textContent = `Hola, ${userData.nombre}!`;
+                } else {
+                    displayUsernameSpan.textContent = 'Hola!';
+                }
+
+                if (userData.fecha_nacimiento) {
+                    const { years, months } = calculateAge(userData.fecha_nacimiento);
+                    displayUserAgeSpan.textContent = `(${years} años y ${months} meses)`;
+                } else {
+                    displayUserAgeSpan.textContent = '';
+                }
 
                 return userData;
             } else {
