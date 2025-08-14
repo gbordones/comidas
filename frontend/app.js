@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // --- ELEMENTOS DEL DOM ---
     const foodNameInput = document.getElementById('food-name');
     const suggestionsDiv = document.getElementById('suggestions');
     const quantityInput = document.getElementById('quantity');
@@ -6,25 +7,42 @@ document.addEventListener('DOMContentLoaded', () => {
     const macroInfoDiv = document.getElementById('macro-info');
     const foodForm = document.getElementById('food-form');
     const themeToggleButton = document.getElementById('theme-toggle');
-
-    // New elements for daily summary and meals list
     const totalCaloriesSpan = document.getElementById('total-calories');
     const totalProteinSpan = document.getElementById('total-protein');
     const totalCarbsSpan = document.getElementById('total-carbs');
     const totalFatSpan = document.getElementById('total-fat');
     const mealsListUl = document.getElementById('meals-list');
+    const prevDayBtn = document.getElementById('prev-day-btn');
+    const nextDayBtn = document.getElementById('next-day-btn');
+    const currentDateDisplay = document.getElementById('current-date-display');
+
+    // --- ESTADO DE LA APLICACIÓN ---
+    let selectedFood = null;
+    let currentDate = new Date(); // Comienza con la fecha de hoy
 
     // --- CONFIGURACIÓN ---
-    const USDA_API_KEY = 'J3vt0lhEQv2gnTa558QTcd4ECtxfZWkbe6xoivog'; 
-    const USDA_API_URL = 'https://api.nal.usda.gov/fdc/v1/foods/search';
-    const FLASK_BACKEND_ADD_URL = 'http://192.168.10.52:8050/agregar_comida';
-    const FLASK_BACKEND_GET_TODAY_URL = 'http://192.168.10.52:8050/obtener_comidas_del_dia';
-
-    let selectedFood = null;
+    // La URL del backend ahora es relativa, no depende de una IP fija.
+    const BACKEND_BASE_URL = ''; // Se asume que el frontend se sirve desde el mismo host que el backend
 
     // --- FUNCIONES ---
 
-    // Theme Toggle Functionality
+    // Formatea un objeto Date a un string 'YYYY-MM-DD'
+    function formatDate(date) {
+        return date.toISOString().split('T')[0];
+    }
+
+    // Actualiza el h3 que muestra la fecha
+    function updateDateDisplay() {
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        // Formato especial para el día de hoy
+        if (formatDate(currentDate) === formatDate(new Date())) {
+            currentDateDisplay.textContent = `Hoy, ${currentDate.toLocaleDateString('es-ES', options)}`;
+        } else {
+            currentDateDisplay.textContent = currentDate.toLocaleDateString('es-ES', options);
+        }
+    }
+
+    // Cambia el tema (claro/oscuro)
     function setTheme(theme) {
         document.body.classList.remove('light-mode', 'dark-mode');
         document.body.classList.add(theme);
@@ -37,19 +55,15 @@ document.addEventListener('DOMContentLoaded', () => {
         setTheme(newTheme);
     }
 
-    // Apply saved theme on load
-    const savedTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark-mode' : 'light-mode');
-    setTheme(savedTheme);
-
-
-    // Función para buscar alimentos en la API de USDA
+    // Busca alimentos usando nuestro propio backend como proxy
     async function searchFood(query) {
         if (query.length < 3) {
             suggestionsDiv.innerHTML = '';
             return;
         }
         try {
-            const response = await fetch(`${USDA_API_URL}?query=${query}&api_key=${USDA_API_KEY}`);
+            // La petición ahora va a nuestro backend, que es más seguro
+            const response = await fetch(`${BACKEND_BASE_URL}/buscar_alimento?query=${query}`);
             const data = await response.json();
             displaySuggestions(data.foods);
         } catch (error) {
@@ -58,14 +72,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Función para mostrar sugerencias
+    // Muestra las sugerencias de alimentos
     function displaySuggestions(foods) {
         suggestionsDiv.innerHTML = '';
         if (foods && foods.length > 0) {
             foods.forEach(food => {
                 const div = document.createElement('div');
                 div.textContent = food.description;
-                div.dataset.fdcId = food.fdcId;
                 div.addEventListener('click', () => selectFood(food));
                 suggestionsDiv.appendChild(div);
             });
@@ -74,78 +87,55 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Función para seleccionar un alimento de las sugerencias
+    // Selecciona un alimento y obtiene sus macros
     async function selectFood(food) {
         foodNameInput.value = food.description;
         suggestionsDiv.innerHTML = '';
-        selectedFood = null; // Resetear el alimento seleccionado
+        selectedFood = null;
 
         try {
-            const response = await fetch(`https://api.nal.usda.gov/fdc/v1/food/${food.fdcId}?api_key=${USDA_API_KEY}`);
-            const data = await response.json();
-
-            const nutrients = data.foodNutrients;
-            let calories = 0;
-            let protein = 0;
-            let carbs = 0;
-            let fat = 0;
-
-            nutrients.forEach(n => {
-                const nutrientNameLower = n.nutrient.name.toLowerCase();
-                const unitNameLower = n.nutrient.unitName ? n.nutrient.unitName.toLowerCase() : '';
-
-                if (nutrientNameLower.includes('energy') && unitNameLower.includes('kcal')) {
-                    calories = n.amount;
-                } else if (nutrientNameLower.includes('protein')) {
-                    protein = n.amount;
-                } else if (nutrientNameLower.includes('carbohydrate') && nutrientNameLower.includes('by difference')) {
-                    carbs = n.amount;
-                } else if (nutrientNameLower.includes('total lipid') || nutrientNameLower.includes('fat')) {
-                    fat = n.amount;
-                }
-            });
+            // La petición de detalles también va a nuestro backend
+            const response = await fetch(`${BACKEND_BASE_URL}/detalles_alimento?fdcId=${food.fdcId}`);
+            const nutrientData = await response.json();
 
             selectedFood = {
                 description: food.description,
-                calories: calories,
-                protein: protein,
-                carbs: carbs,
-                fat: fat
+                calories: nutrientData.calories || 0,
+                protein: nutrientData.protein || 0,
+                carbs: nutrientData.carbs || 0,
+                fat: nutrientData.fat || 0
             };
             displayMacroInfo();
 
         } catch (error) {
             console.error('Error obteniendo detalles del alimento:', error);
-            macroInfoDiv.innerHTML = '<div style="color: red;">Error al cargar detalles nutricionales.</div>';
+            macroInfoDiv.innerHTML = '<div style="color: red;">Error al cargar detalles.</div>';
         }
     }
 
-    // Función para mostrar la información de macronutrientes
+    // Muestra la info de macros para el alimento seleccionado
     function displayMacroInfo() {
         if (selectedFood) {
             const quantity = parseFloat(quantityInput.value) || 100;
             const factor = quantity / 100;
-
             macroInfoDiv.innerHTML = `
                 <h3>Información Nutricional (por ${quantity}g):</h3>
                 <p>Calorías: <strong>${(selectedFood.calories * factor).toFixed(2)} kcal</strong></p>
                 <p>Proteínas: <strong>${(selectedFood.protein * factor).toFixed(2)} g</strong></p>
                 <p>Carbohidratos: <strong>${(selectedFood.carbs * factor).toFixed(2)} g</strong></p>
-                <p>Grasas: <strong>${(selectedFood.fat * factor).toFixed(2)} g</strong></strong></p>
+                <p>Grasas: <strong>${(selectedFood.fat * factor).toFixed(2)} g</strong></p>
             `;
         } else {
             macroInfoDiv.innerHTML = '';
         }
     }
 
-    // Función para enviar los datos al backend de Flask
+    // Envía una nueva comida al backend
     async function sendFoodData(foodData) {
         try {
-            const response = await fetch(FLASK_BACKEND_ADD_URL, {
+            const response = await fetch(`${BACKEND_BASE_URL}/agregar_comida`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(foodData),
             });
             const result = await response.json();
@@ -154,7 +144,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 foodForm.reset();
                 macroInfoDiv.innerHTML = '';
                 selectedFood = null;
-                fetchTodayMeals(); // Refresh today's meals and summary
+                fetchMealsForDate(); // Recarga las comidas para la fecha actual
             } else {
                 alert('Error al registrar comida: ' + result.error);
             }
@@ -164,31 +154,30 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Función para obtener y mostrar las comidas del día
-    async function fetchTodayMeals() {
+    // Obtiene y muestra las comidas para la fecha seleccionada (reemplaza a fetchTodayMeals)
+    async function fetchMealsForDate() {
+        updateDateDisplay();
+        const dateStr = formatDate(currentDate);
+
         try {
-            const response = await fetch(FLASK_BACKEND_GET_TODAY_URL);
+            const response = await fetch(`${BACKEND_BASE_URL}/obtener_comidas_del_dia?fecha=${dateStr}`);
             const meals = await response.json();
 
-            mealsListUl.innerHTML = ''; // Clear previous list
-            let totalCalories = 0;
-            let totalProtein = 0;
-            let totalCarbs = 0;
-            let totalFat = 0;
+            mealsListUl.innerHTML = '';
+            let totalCalories = 0, totalProtein = 0, totalCarbs = 0, totalFat = 0;
 
             if (meals && meals.length > 0) {
                 meals.forEach(meal => {
                     const li = document.createElement('li');
-                    li.innerHTML = `<strong>${meal.tipo_comida}</strong>: ${meal.alimento} (${meal.cantidad}g) - ${meal.calorias} kcal, ${meal.proteinas}g P, ${meal.carbohidratos}g C, ${meal.grasas}g G`;
+                    li.innerHTML = `<strong>${meal.tipo_comida}</strong>: ${meal.alimento} (${meal.cantidad_gr}g) - ${meal.calorias} kcal, ${meal.proteinas}g P, ${meal.carbohidratos}g C, ${meal.grasas}g G`;
                     mealsListUl.appendChild(li);
-
                     totalCalories += parseFloat(meal.calorias);
                     totalProtein += parseFloat(meal.proteinas);
                     totalCarbs += parseFloat(meal.carbohidratos);
                     totalFat += parseFloat(meal.grasas);
                 });
             } else {
-                mealsListUl.innerHTML = '<li>No hay comidas registradas para hoy.</li>';
+                mealsListUl.innerHTML = '<li>No hay comidas registradas para esta fecha.</li>';
             }
 
             totalCaloriesSpan.textContent = totalCalories.toFixed(2);
@@ -197,40 +186,32 @@ document.addEventListener('DOMContentLoaded', () => {
             totalFatSpan.textContent = totalFat.toFixed(2);
 
         } catch (error) {
-            console.error('Error obteniendo comidas del día:', error);
-            mealsListUl.innerHTML = '<li style="color: red;">Error al cargar comidas del día.</li>';
-            totalCaloriesSpan.textContent = 'Error';
-            totalProteinSpan.textContent = 'Error';
-            totalCarbsSpan.textContent = 'Error';
-            totalFatSpan.textContent = 'Error';
+            console.error('Error obteniendo comidas:', error);
+            mealsListUl.innerHTML = '<li style="color: red;">Error al cargar las comidas.</li>';
         }
     }
 
     // --- EVENT LISTENERS ---
 
-    foodNameInput.addEventListener('input', () => {
-        searchFood(foodNameInput.value);
-    });
-
+    foodNameInput.addEventListener('input', () => searchFood(foodNameInput.value));
     quantityInput.addEventListener('input', displayMacroInfo);
 
     foodForm.addEventListener('submit', (event) => {
         event.preventDefault();
-
         if (!selectedFood) {
             alert('Por favor, selecciona un alimento de la lista de sugerencias.');
             return;
         }
-
         const quantity = parseFloat(quantityInput.value) || 0;
         if (quantity <= 0) {
             alert('Por favor, introduce una cantidad válida.');
             return;
         }
-
         const factor = quantity / 100;
 
         const foodData = {
+            // Añadimos la fecha al objeto que se envía
+            fecha: formatDate(currentDate),
             tipo_comida: mealTypeSelect.value,
             alimento: selectedFood.description,
             cantidad: quantity,
@@ -239,14 +220,25 @@ document.addEventListener('DOMContentLoaded', () => {
             carbohidratos: (selectedFood.carbs * factor).toFixed(2),
             grasas: (selectedFood.fat * factor).toFixed(2)
         };
-
         sendFoodData(foodData);
     });
 
     themeToggleButton.addEventListener('click', toggleTheme);
 
-    // Initial fetch of today's meals when the page loads
-    fetchTodayMeals();
+    prevDayBtn.addEventListener('click', () => {
+        currentDate.setDate(currentDate.getDate() - 1);
+        fetchMealsForDate();
+    });
 
-    console.log('Tracker de Macros listo.');
+    nextDayBtn.addEventListener('click', () => {
+        currentDate.setDate(currentDate.getDate() + 1);
+        fetchMealsForDate();
+    });
+
+    // --- INICIALIZACIÓN ---
+    const savedTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark-mode' : 'light-mode');
+    setTheme(savedTheme);
+    fetchMealsForDate(); // Carga inicial de datos para el día de hoy
+
+    console.log('Tracker de Macros v2 listo.');
 });

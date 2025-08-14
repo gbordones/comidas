@@ -1,6 +1,7 @@
 Flask
-openpyxl
 requests
 flask_cors
 gunicorn
 uvicorn
+psycopg2-binary
+python-dotenv
